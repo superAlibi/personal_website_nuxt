@@ -1,0 +1,5 @@
+.admin_layout {
+  section {
+    height: calc(100% - 36px);
+  }
+}
