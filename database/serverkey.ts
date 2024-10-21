@@ -1,10 +1,9 @@
 import { randomBytes } from 'node:crypto'
 const BaseName = "server-secret-key";
 
-import { getPool } from './postgre'
+import { pgClient as client } from './postgre'
 // const envSecretKey = "server-secret-key";
 export async function getServerSecretKey() {
-  const client = await getPool().connect();
   const { rows } = await client.query<{ const_value: string }>('select const_value  from constants where const_key=$1', [BaseName])
   let value = rows[0]?.const_value
   if (!value) {
@@ -20,8 +19,6 @@ export async function getServerSecretKey() {
 
   }
 
-  // 释放数据库连接
-  client.release();
 
   return value
 }

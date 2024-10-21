@@ -1,6 +1,6 @@
 import type { ManipulateType } from "dayjs";
-import { getPool } from "./postgre";
-const pool = getPool()
+import { pgClient as client } from "./postgre";
+
 
 // 凭据简写
 export interface CredentialMeta {
@@ -72,7 +72,7 @@ export interface DriveMeta {
 export async function GetCredit(
   credit: string,
 ): Promise<CredentialMeta | undefined> {
-  const client = await pool.connect()
+  await client.connect()
 
   const result = await client.query<CredentialMeta>(
     `select 
@@ -98,15 +98,13 @@ export async function GetCredit(
     `,
     [credit])
   data.drives = drives.rows
-  client.release();
   return data;
 }
 /**
  * 给出所有的凭据
  * @returns
  */
-export async function GetCreditList(page: number, size: number, options: CredentialMeta): Promise<CredentialMeta[]> {
-  const client = await pool.connect()
+export async function GetCreditList(page: number = 1, size: number = 10, options: CredentialMeta = {}): Promise<CredentialMeta[]> {
   const result = await client.query<CredentialMeta>(`
     select 
       cre.id , cre.create_at,cre.com_name,cre."interval",cre.access_token, cre.duration_unit,cre.duration,cre.au_scope,
@@ -114,13 +112,11 @@ export async function GetCreditList(page: number, size: number, options: Credent
     from 
       public.credentials as cre 
       left join public.acc_drive as ad on cre.id=ad.cre_id
-    where 
-      cre.com_name like '%' || $1 || '%'
+    ${options.corporateName ? "where cre.com_name like '%' || $1 || '%'" : ''}
     group by cre.id
     limit $2 offset $3
     ;`,
     [options.corporateName, size, (page - 1) * size])
-  client.release();
   return result.rows
 }
 
@@ -131,14 +127,12 @@ export type UpdateCredentialParam = Omit<CredentialMeta, "createAt">;
  * @returns
  */
 export async function addCredential(params: CredentialMeta) {
-  const client = await pool.connect()
   await client.query(`insert into public.credentials (id,com_name,interval,au_scope) values ($1,$2,$3,$4)`,
     [params.id, params.corporateName, params.interval, params.auScope]);
   // 这行代码是用来释放数据库连接的。
   // 在完成数据库操作后，释放连接是一个良好的实践，
   // 它可以将连接返回到连接池中，供其他操作使用，
   // 从而提高数据库连接的利用效率。
-  client.release();
 }
 /**
  * 更新分享信息
@@ -149,10 +143,8 @@ export async function addCredential(params: CredentialMeta) {
 export async function UpdateCredential(
   params: UpdateCredentialParam,
 ) {
-  const client = await pool.connect()
   await client.query(`update public.credentials set access_token=$1,com_name=$2,interval=$3,au_scope=$4,update_at=NOW() where id=$5`,
     [params.accessToken, params.corporateName, params.interval, params.auScope, params.id]);
-  client.release();
 }
 /**
  * 根据分享id添加设备
@@ -164,19 +156,16 @@ export async function AddDriversByCredit(
   credit: number,
   drives: DriveMeta,
 ) {
-  const client = await pool.connect()
   await client.query(`insert into public.acc_drive (cre_id,last_acc) values ($1,$2)`,
     [credit, drives.lastAccessAt]);
-  client.release();
 }
 export async function updateDriveAccTime(
   credit: number,
   drives: DriveMeta,
 ) {
-  const client = await pool.connect()
   await client.query(`update public.acc_drive set last_acc=now()   where cre_id=$1 and id=$2`,
     [credit, drives.driveId]);
-  client.release();
+
 }
 
 /**
@@ -185,7 +174,5 @@ export async function updateDriveAccTime(
  */
 export async function DeleteCredit(param: Array<number | string>) {
   if (!param.length) { return }
-  const client = await pool.connect()
   await client.query(`delete from public.credentials where id in ($1)`, [param])
-  client.release();
 }

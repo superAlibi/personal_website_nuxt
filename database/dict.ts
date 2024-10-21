@@ -1,4 +1,4 @@
-import { getPool } from "./postgre";
+import { pgClient as client } from "./postgre";
 export interface DictMetaGroup {
   category: string;
   subject: string;
@@ -19,7 +19,7 @@ export type DictDetail = DictMetaGroup & {
 };
 
 export async function getDictRaw(prefix?: string): Promise<DictMeta[]> {
-  const client = await getPool().connect();
+  await client.connect();
   const first =
     `select dm.classification as category,dm.subject,dm.description as metaDescription ,dm.sortno as metaSortNo,d.lang,d.e_label as label,d.e_value as value,d.description ,d.sortno as sortNo
     from dict_meta as dm left outer join dict_enum as d on d.classification=dm.classification`;
@@ -30,9 +30,7 @@ export async function getDictRaw(prefix?: string): Promise<DictMeta[]> {
     [first, second, end].join(" "),
   ).then((result) => {
     return result.rows;
-  }).finally(() => {
-    client.release();
-  });
+  })
 }
 
 export function getDict(prefix?: string): Promise<DictDetail> {
@@ -73,7 +71,7 @@ export async function saveDict(params: DictDetail): Promise<void> {
   const insertEnumSql = `
   insert into dict_enum(classification,lang,e_label,e_value,description,sortno) values($1,$2,$3,$4,$5,$6) on conflict(classification,lang) do update set e_label=$3,e_value=$4,description=$5,sortno=$6;
 `;
-  const client = await getPool().connect();
+  await client.connect();
 
   // 创建事务对象
   /* const t = client.createTransaction("wtf", {
@@ -121,6 +119,5 @@ export async function saveDict(params: DictDetail): Promise<void> {
     console.error(e);
   }
 
-  // await t.commit();
-  client.release();
+
 }
