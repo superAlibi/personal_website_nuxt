@@ -1,6 +1,5 @@
 import type { ManipulateType } from "dayjs";
 import { getPool } from "./postgre";
-const BaseName = "resume";
 const pool = getPool()
 
 // 凭据简写

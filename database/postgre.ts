@@ -1,10 +1,9 @@
-import { Pool } from "pg";
-let pgpool: Pool;
+import PG from "pg";
+let pgpool: PG.Pool;
 export function getPool() {
   if (pgpool) return pgpool;
 
-  return pgpool = new Pool({
+  return pgpool = new PG.Pool({
     max: 10
   });
 }
-globalThis.addEventListener("unload", () => pgpool.end());

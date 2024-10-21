@@ -13,7 +13,7 @@ export async function getServerSecretKey() {
     const buf = randomBytes(16);
 
     // 将随机密钥转换为十六进制字符串
-    value = buf.toString('hex');
+    value = buf.toString('base64');
 
     // 将新生成的密钥存储到数据库
     await client.query('INSERT INTO constants (const_key, const_value) VALUES ($1, $2)', [BaseName, value]);

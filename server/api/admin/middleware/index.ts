@@ -4,16 +4,7 @@ import { decodeBase64 } from "@std/encoding/base64";
 import { generateAESCryptoObject } from "~/tools/crypto/server";
 import { ConsoleHandler, getLogger, setup } from "@std/log";
 import dayjs from "dayjs";
-setup({
-  handlers: {
-    default: new ConsoleHandler("INFO", {
-      formatter: (record) => {
-        return `api/admin middleware: ${dayjs(record.datetime).format("YYYY-MM-DD HH:mm:ss")
-          } [${record.levelName}] ${record.msg}`;
-      },
-    }),
-  },
-});
+
 const dl = getLogger();
 // 接口白名单列表
 const whiteList: Array<string> = [];
@@ -45,10 +36,10 @@ export default defineEventHandler(async (event) => {
   }
 
   const { data, iv } = await readBody(event);
-
-  return generateAESCryptoObject().then(aes => aes.decrypt(decodeBase64(data), decodeBase64(iv)))
+  return {}
+  /* return generateAESCryptoObject().then(aes => aes.decrypt(decodeBase64(data), decodeBase64(iv)))
     .then((plaintext) => {
       const info = decoder.decode(plaintext);
       event.context.state = JSON.parse(info);
-    })
+    }) */
 })

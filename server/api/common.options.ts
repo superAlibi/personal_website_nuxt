@@ -14,7 +14,9 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Invalid parameter",
     });
   }
-  return generateAESCryptoObject().then(aes => aes.decrypt(bindate, biniv))
+
+  return {}
+  /* return generateAESCryptoObject().then(aes => aes.decrypt(bindate, biniv))
 
     .then((d) => {
       const data = decoder.decode(d);
@@ -23,6 +25,6 @@ export default defineEventHandler(async (event) => {
         ...parsedData,
         message: "ok",
       };
-    });
+    }); */
 
 });

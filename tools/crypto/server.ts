@@ -3,5 +3,5 @@ import { AESCBC } from "@advanced/crypto";
 
 let CurrentAES: AESCBC
 export async function generateAESCryptoObject() {
-  return CurrentAES ?? (CurrentAES = new AESCBC(new TextEncoder().encode(await getServerSecretKey())));
+  return CurrentAES ?? (CurrentAES = new AESCBC(await getServerSecretKey()));
 }
