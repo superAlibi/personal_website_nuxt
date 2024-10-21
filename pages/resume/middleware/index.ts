@@ -65,11 +65,9 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
 
     // 设置cookie
     driverIdCookie.value = uuid;
+    // TODO 报错处理
+    await UpdateCredential(result);
 
-    const { ok } = await UpdateCredential(result);
-    if (!ok) {
-      dl.warn("更新设备id失败");
-    }
   } else {
     dl.info("state:" + state + ":访问设备:" + driverIdCookie.value);
     // todo 什么设备什么时候访问过可以在此记录

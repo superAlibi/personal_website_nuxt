@@ -1,7 +1,7 @@
 
 
 import { decodeBase64 } from "@std/encoding/base64";
-import { CurrentAES } from "~/tools/crypto/server";
+import { generateAESCryptoObject } from "~/tools/crypto/server";
 import { ConsoleHandler, getLogger, setup } from "@std/log";
 import dayjs from "dayjs";
 setup({
@@ -46,7 +46,7 @@ export default defineEventHandler(async (event) => {
 
   const { data, iv } = await readBody(event);
 
-  return CurrentAES.decrypt(decodeBase64(data), decodeBase64(iv))
+  return generateAESCryptoObject().then(aes => aes.decrypt(decodeBase64(data), decodeBase64(iv)))
     .then((plaintext) => {
       const info = decoder.decode(plaintext);
       event.context.state = JSON.parse(info);

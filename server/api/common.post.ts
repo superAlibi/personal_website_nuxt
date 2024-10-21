@@ -1,5 +1,5 @@
 import { decodeBase64, encodeBase64 } from "@std/encoding";
-import { CurrentAES } from "~/tools/crypto/server";
+import { generateAESCryptoObject } from "~/tools/crypto/server";
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
 export default defineEventHandler(async (event) => {
@@ -18,7 +18,7 @@ export default defineEventHandler(async (event) => {
         },
       );
     }
-    return CurrentAES.decrypt(bindate, biniv)
+    return generateAESCryptoObject().then(aes => aes.decrypt(bindate, biniv))
       .then(async (d) => {
         const data = decoder.decode(d);
         const parsedData = JSON.parse(data);
@@ -27,12 +27,11 @@ export default defineEventHandler(async (event) => {
           message: "ok",
         });
         const iv = crypto.getRandomValues(new Uint8Array(16));
-        const ciphertext = await CurrentAES.encrypt(encoder.encode(responsedata), iv);
-        return {
-          data: encodeBase64(ciphertext),
-          iv: encodeBase64(iv),
-        }
-
+        return generateAESCryptoObject().then(aes => aes.encrypt(encoder.encode(responsedata), iv))
+          .then(ciphertext => ({
+            data: encodeBase64(ciphertext),
+            iv: encodeBase64(iv),
+          }));
       });
   } catch (e) {
     console.error(e);

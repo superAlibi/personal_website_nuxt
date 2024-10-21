@@ -1,4 +1,7 @@
-import { getServerSecretKey } from "../../database/serverkey.js";
+import { getServerSecretKey } from "~/database/serverkey";
 import { AESCBC } from "@advanced/crypto";
 
-export const CurrentAES = new AESCBC(await getServerSecretKey());
+let CurrentAES: AESCBC
+export async function generateAESCryptoObject() {
+  return CurrentAES ?? (CurrentAES = new AESCBC(new TextEncoder().encode(await getServerSecretKey())));
+}

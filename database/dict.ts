@@ -21,9 +21,9 @@ export type DictDetail = DictMetaGroup & {
 export async function getDictRaw(prefix?: string): Promise<DictMeta[]> {
   const client = await getPool().connect();
   const first =
-    `select dm.family as category,dm.subject,dm.description as metaDescription ,dm.sortno as metaSortNo,d.lang,d.label,d.value,d.description ,d.sortno as sortNo
-    from dict_meta as dm left outer join dict_enum as d on d.type=dm.family`;
-  const second = prefix ? ` where dm.family like '%${prefix}%'` : " ";
+    `select dm.classification as category,dm.subject,dm.description as metaDescription ,dm.sortno as metaSortNo,d.lang,d.e_label as label,d.e_value as value,d.description ,d.sortno as sortNo
+    from dict_meta as dm left outer join dict_enum as d on d.classification=dm.classification`;
+  const second = prefix ? ` where dm.classification like '%${prefix}%'` : " ";
   const end = ` order by dm.sortno asc ,d.sortno asc ;`;
 
   return client.query<DictMeta>(
@@ -67,11 +67,11 @@ export function getDict(prefix?: string): Promise<DictDetail> {
 export async function saveDict(params: DictDetail): Promise<void> {
   //更新字典节点数据的sql
   const insertMtaSql = `
-    insert into dict_meta(family,subject,description,sortno) values($1,$2,$3,$4) on conflict(family) do update set subject=$2,description=$3,sortno=$4;
+    insert into dict_meta(classification,subject,description,sortno) values($1,$2,$3,$4) on conflict(classification) do update set subject=$2,description=$3,sortno=$4;
   `;
   // 更新字典枚举值的sql
   const insertEnumSql = `
-  insert into dict_enum(type,lang,label,value,description,sortno) values($1,$2,$3,$4,$5,$6) on conflict(type,lang) do update set label=$3,value=$4,description=$5,sortno=$6;
+  insert into dict_enum(classification,lang,e_label,e_value,description,sortno) values($1,$2,$3,$4,$5,$6) on conflict(classification,lang) do update set e_label=$3,e_value=$4,description=$5,sortno=$6;
 `;
   const client = await getPool().connect();
 

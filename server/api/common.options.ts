@@ -1,5 +1,5 @@
 import { decodeBase64, encodeBase64 } from "@std/encoding";
-import { CurrentAES } from "~/tools/crypto/server";
+import { generateAESCryptoObject } from "~/tools/crypto/server";
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
 export default defineEventHandler(async (event) => {
@@ -14,7 +14,8 @@ export default defineEventHandler(async (event) => {
       statusMessage: "Invalid parameter",
     });
   }
-  return CurrentAES.decrypt(bindate, biniv)
+  return generateAESCryptoObject().then(aes => aes.decrypt(bindate, biniv))
+
     .then((d) => {
       const data = decoder.decode(d);
       const parsedData = JSON.parse(data);

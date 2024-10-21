@@ -3,10 +3,10 @@ import {
 } from "~/database/resume";
 import { getResumeAuthingSDK } from "~/tools/sdk/authing";
 
-import dayjs from "dayjs";
+
 import type { UserInfo } from "~/types";
 import { useLogger } from "nuxt/kit";
-import type { UserSingleRespDto } from "authing-node-sdk/dist/models";
+
 export const DriverIDKey = "di";
 
 export interface ResumeCTX extends CredentialMeta {
