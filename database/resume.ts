@@ -72,52 +72,50 @@ export interface DriveMeta {
 export async function GetCredit(
   credit: string,
 ): Promise<CredentialMeta | undefined> {
-  await client.connect()
 
-  const result = await client.query<CredentialMeta>(
+  const result = await client<CredentialMeta[]>
     `select 
     cre.id , cre.create_at,cre.com_name,cre."interval",cre.access_token, cre.duration_unit,cre.duration,cre.au_scope
     from 
     public.credentials as cre left join public.acc_drive as ad on cre.id=ad.cre_id
-    where cre.id=$1
-    group by cre.id`,
-    [credit])
+    where cre.id=${credit}
+    group by cre.id`
 
-  const data = result.rows.at(0)
+
+  const data = result.at(0)
   if (!data) {
     return
   }
-  const drives = await client.query<DriveMeta>(`
+  const drives = await client<DriveMeta[]>`
     select
       ad.id,ad.acc_time,ad.last_acc,
       count(msg.id) as msg_count
     from
 	    public.acc_drive as ad left join public.messages as msg on ad.id=msg.id
-    where ad.cre_id=$1
+    where ad.cre_id=${credit}
     group by ad.id
-    `,
-    [credit])
-  data.drives = drives.rows
+    `
+  data.drives = drives
   return data;
 }
 /**
  * 给出所有的凭据
  * @returns
  */
-export async function GetCreditList(page: number = 1, size: number = 10, options: CredentialMeta = {}): Promise<CredentialMeta[]> {
-  const result = await client.query<CredentialMeta>(`
+export async function GetCreditList(page: number = 1, size: number = 10, options: Partial<CredentialMeta> = {}): Promise<CredentialMeta[]> {
+  const dynamicSql = (corporateName: string) => client`where cre.com_name like %${corporateName}%`
+  const result = await client<CredentialMeta[]>`
     select 
       cre.id , cre.create_at,cre.com_name,cre."interval",cre.access_token, cre.duration_unit,cre.duration,cre.au_scope,
       count(ad.id) as acc_drive_count
     from 
       public.credentials as cre 
       left join public.acc_drive as ad on cre.id=ad.cre_id
-    ${options.corporateName ? "where cre.com_name like '%' || $1 || '%'" : ''}
+    ${options.corporateName ? dynamicSql(options.corporateName) : client``}
     group by cre.id
-    limit $2 offset $3
-    ;`,
-    [options.corporateName, size, (page - 1) * size])
-  return result.rows
+    limit ${size} offset ${(page - 1) * size}
+    ;`
+  return result
 }
 
 export type UpdateCredentialParam = Omit<CredentialMeta, "createAt">;
@@ -127,8 +125,9 @@ export type UpdateCredentialParam = Omit<CredentialMeta, "createAt">;
  * @returns
  */
 export async function addCredential(params: CredentialMeta) {
-  await client.query(`insert into public.credentials (id,com_name,interval,au_scope) values ($1,$2,$3,$4)`,
-    [params.id, params.corporateName, params.interval, params.auScope]);
+  await client`insert into public.credentials (id,com_name,interval,au_scope) 
+  values
+   (${params.id},${params.corporateName},$${params.interval},${params.auScope})`
   // 这行代码是用来释放数据库连接的。
   // 在完成数据库操作后，释放连接是一个良好的实践，
   // 它可以将连接返回到连接池中，供其他操作使用，
@@ -143,8 +142,13 @@ export async function addCredential(params: CredentialMeta) {
 export async function UpdateCredential(
   params: UpdateCredentialParam,
 ) {
-  await client.query(`update public.credentials set access_token=$1,com_name=$2,interval=$3,au_scope=$4,update_at=NOW() where id=$5`,
-    [params.accessToken, params.corporateName, params.interval, params.auScope, params.id]);
+  await client`update public.credentials set 
+  access_token=${params.accessToken!},
+  com_name=${params.corporateName},
+  interval=${params.interval},
+  au_scope=${params.auScope},
+  update_at=NOW()
+   where id=${params.id}`
 }
 /**
  * 根据分享id添加设备
@@ -153,18 +157,16 @@ export async function UpdateCredential(
  * @returns
  */
 export async function AddDriversByCredit(
-  credit: number,
-  drives: DriveMeta,
+  credit: number
 ) {
-  await client.query(`insert into public.acc_drive (cre_id,last_acc) values ($1,$2)`,
-    [credit, drives.lastAccessAt]);
+  await client`insert into public.acc_drive (cre_id)
+   values ($${credit})`;
 }
 export async function updateDriveAccTime(
   credit: number,
   drives: DriveMeta,
 ) {
-  await client.query(`update public.acc_drive set last_acc=now()   where cre_id=$1 and id=$2`,
-    [credit, drives.driveId]);
+  await client`update public.acc_drive set last_acc=now()   where cre_id=${credit} and id=${drives.driveId}`;
 
 }
 
@@ -174,5 +176,5 @@ export async function updateDriveAccTime(
  */
 export async function DeleteCredit(param: Array<number | string>) {
   if (!param.length) { return }
-  await client.query(`delete from public.credentials where id in ($1)`, [param])
+  await client`delete from public.credentials where id in (${param})`
 }

@@ -1,16 +1,9 @@
 <script setup lang="ts">
-import STDTable from "~/components/stdtable.vue";
-
-import { type CredentialMeta, GetCreditList } from "~/database/resume";
+import { type CredentialMeta } from "~/database/resume";
 import { type DriveMeta } from "~/database/resume";
 import type { TableActionButtonsProps, TableColumn } from "~/components/stdtable.props";
 
 
-interface ResumeTableProps {
-  // action: string;
-  data: CredentialMeta[];
-}
-const props = defineProps<ResumeTableProps>();
 const choosedSet = reactive(new Set<number | string>());
 
 function handleCopy(params: string | number) {
@@ -58,7 +51,8 @@ const columns: TableColumn<DriveMeta>[] = [
 
   },
 ]
-function handleSelect(rows: CredentialMeta[]) {
+function handleSelect(e: CredentialMeta[]) {
+  const rows = e
   choosedSet.clear()
   rows.forEach(r => {
     choosedSet.add(r.id)
@@ -96,11 +90,11 @@ const listColums: TableColumn<CredentialMeta>[] = [
   },
 ]
 
-const { data, refresh } = useFetch<CredentialMeta[]>("/api/admin/resume")
+const { data, refresh } = useFetch<CredentialMeta[]>("/api/admin/resume", { params: { pageNo: 1, pageSize: 10 }, lazy: true, server: false, })
 async function handleDelete() {
-  await useAsyncData("resumeDelete", () => {
-    return $fetch("/api/admin/resume", { query: { ids: Array.from(choosedSet.values()) }, method: 'delete' })
-  })
+
+  await $fetch("/api/admin/resume", { query: { ids: Array.from(choosedSet.values()) }, method: 'delete' })
+
   refresh()
 }
 const tableActions: TableActionButtonsProps[] = [
@@ -135,54 +129,58 @@ const tableActions: TableActionButtonsProps[] = [
 
 </script>
 <template>
+  <NuxtLayout name="admin">
+    <dialog ref="dialogRef"
+      class="fixed  rounded-lg z-40 max-h-screen p-4 overflow-y-auto transition-transform  bg-white w-max dark:bg-gray-800"
+      aria-labelledby="drawer-label">
+      <h5 id="drawer-label"
+        class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
+        <svg class="w-4 h-4 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+          viewBox="0 0 20 20">
+          <path
+            d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
+        </svg>设备信息
+      </h5>
+      <button aria-controls="drawer-example" @click="dialogRef?.close()"
+        class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white">
+        <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
+        </svg>
+        <span class="sr-only">Close menu</span>
+      </button>
 
-  <dialog ref="dialogRef"
-    class="fixed  rounded-lg z-40 max-h-screen p-4 overflow-y-auto transition-transform  bg-white w-max dark:bg-gray-800"
-    aria-labelledby="drawer-label">
-    <h5 id="drawer-label"
-      class="inline-flex items-center mb-4 text-base font-semibold text-gray-500 dark:text-gray-400">
-      <svg class="w-4 h-4 me-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-        viewBox="0 0 20 20">
-        <path
-          d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5ZM9.5 4a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3ZM12 15H8a1 1 0 0 1 0-2h1v-3H8a1 1 0 0 1 0-2h2a1 1 0 0 1 1 1v4h1a1 1 0 0 1 0 2Z" />
-      </svg>设备信息
-    </h5>
-    <button aria-controls="drawer-example" @click="dialogRef?.close()"
-      class="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 absolute top-2.5 end-2.5 flex items-center justify-center dark:hover:bg-gray-600 dark:hover:text-white">
-      <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 14 14">
-        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6" />
-      </svg>
-      <span class="sr-only">Close menu</span>
-    </button>
-
-    <STDTable :tableList="choosedDrive?.drives ?? []" :columns="columns">
-      <template #cell="{ config, row, rowIndex, text }">
-        <template v-if="config.dataIndex === 'messages'">
-          <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-            :href="`/admin/message?di=${row.driveId}`">
-            查看({{ row.messages?.length }})
-          </a>
+      <Stdtable :tableList="choosedDrive?.drives ?? []" :columns="columns">
+        <template #cell="{ config, row, rowIndex, text }">
+          <template v-if="config.dataIndex === 'messages'">
+            <a class="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+              :href="`/admin/message?di=${row.driveId}`">
+              查看({{ row.messages?.length }})
+            </a>
+          </template>
+          <template v-else-if="config.dataIndex === 'createAt'">{{ new Date(text).toLocaleString() }} </template>
+          <template v-else>{{ text }} </template>
         </template>
-        <template v-else-if="config.dataIndex === 'createAt'">{{ new Date(text).toLocaleString() }} </template>
-        <template v-else>{{ text }} </template>
-      </template>
-    </STDTable>
-  </dialog>
-
-  <STDTable class="h-full" @select="handleSelect" :tableList="data ?? []" :actions="tableActions" :columns="listColums">
-    <template #cell="{ config, row, rowIndex, text }">
-      <template v-if="config.dataIndex === 'drives'">
-        <a @click="showDetail(row)" class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer">
-          查看{`(${row.drives?.length ?? 0})`}
-        </a>
-      </template>
-      <template v-else-if="config.dataIndex === 'action'">
-        <a class="hover:cursor-pointer text-blue-600" @click="handleCopy(row.id)">
-          复制
-        </a>
-      </template>
-      <template v-else>{{ text }} </template>
-    </template>
-  </STDTable>
+      </Stdtable>
+    </dialog>
+    <ClientOnly>
+      <Stdtable class="h-full" @select="handleSelect" :tableList="data ?? []" :actions="tableActions"
+        :columns="listColums">
+        <template #cell="{ config, row, rowIndex, text }">
+          <template v-if="config.dataIndex === 'drives'">
+            <a @click="showDetail(row)"
+              class="font-medium text-blue-600 dark:text-blue-500 hover:underline cursor-pointer">
+              查看({{ row.drives?.length ?? 0 }})
+            </a>
+          </template>
+          <template v-else-if="config.dataIndex === 'action'">
+            <a class="hover:cursor-pointer text-blue-600" @click="handleCopy(row.id)">
+              复制
+            </a>
+          </template>
+          <template v-else>{{ text }} </template>
+        </template>
+      </Stdtable>
+    </ClientOnly>
+  </NuxtLayout>
 </template>

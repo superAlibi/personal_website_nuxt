@@ -1,13 +1,15 @@
 <script setup lang="ts">
 
-
+definePageMeta({
+  layout: 'admin'
+})
 import type { TableColumn } from "~/components/stdtable.props";
 import STDTable from "~/components/stdtable.vue";
 
-import { type DictMeta, getDictRaw } from "~/database/dict";
+import { type DictMeta } from "~/database/dict";
 
 
-const { data } = useAsyncData("enumList", () => getDictRaw());
+const { data } = useFetch<DictMeta[]>('/api/admin/dict');
 const columns: TableColumn<DictMeta>[] = [
   {
     header: "字典分类代码",

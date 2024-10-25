@@ -1,5 +1,5 @@
 <script setup lang="ts">
-
+import process from 'node:process'
 const config = useRuntimeConfig()
 
 /* return sdk.revokeToken(jwk)
@@ -41,5 +41,5 @@ const config = useRuntimeConfig()
   }); */
 
 useCookie("jwt", { path: "/admin" }).value = null
-navigateTo(config.public.AUTHING_LOGINOUT_POINT)
+navigateTo(process.env.AUTHING_LOGINOUT_POINT)
 </script>

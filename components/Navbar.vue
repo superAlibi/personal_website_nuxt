@@ -12,7 +12,7 @@ defineProps<NavBarProps>()
 </script>
 <template>
   <div class="group">
-    <!-- {/* 窄屏触发展开菜单按钮 */} -->
+
     <button type="button"
       class=" md:hidden items-center p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg   hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600"
       aria-controls="navbar-default" aria-expanded="false">
@@ -23,7 +23,7 @@ defineProps<NavBarProps>()
       </svg>
     </button>
 
-    <!-- {/* 菜单导航区域 */} -->
+
     <div class="hidden  w-full absolute left-0 right-0  md:w-auto z-10 group-focus-within:block md:block md:static"
       id="navbar-default">
       <ul
@@ -34,7 +34,7 @@ defineProps<NavBarProps>()
             : 'text-gray-900 dark:text-white'
             }`">
             <slot name="icon" :item="item" :index="index">
-              <Icon :name="item.icon" />
+              <Icon v-if="item.icon" :name="item.icon" />
             </slot>
             <span>{{ item.name }}</span>
           </a>

@@ -1,7 +1,7 @@
 import {
   type CredentialMeta,
 } from "~/database/resume";
-import { getResumeAuthingSDK } from "~/tools/sdk/authing";
+import { getResumeAuthingSDK } from "~/utils/sdk/authing";
 
 
 import type { UserInfo } from "~/types";
@@ -59,9 +59,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   return sdk.getProfile({ withCustomData: true })
     .then((user) => {
       dl.info("通过access token获得用户信息成功");
-      contextInfo.value = {
-        user: user.data,
-      }
+
+      contextInfo.value = user?.data
 
 
     }, async (e) => {

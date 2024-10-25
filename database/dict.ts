@@ -19,18 +19,13 @@ export type DictDetail = DictMetaGroup & {
 };
 
 export async function getDictRaw(prefix?: string): Promise<DictMeta[]> {
-  await client.connect();
-  const first =
+  const dynamicSql = (prefix: string) => client` where dm.classification like '%${prefix.trim()}%'`
+  return client<DictMeta[]>
     `select dm.classification as category,dm.subject,dm.description as metaDescription ,dm.sortno as metaSortNo,d.lang,d.e_label as label,d.e_value as value,d.description ,d.sortno as sortNo
-    from dict_meta as dm left outer join dict_enum as d on d.classification=dm.classification`;
-  const second = prefix ? ` where dm.classification like '%${prefix}%'` : " ";
-  const end = ` order by dm.sortno asc ,d.sortno asc ;`;
-
-  return client.query<DictMeta>(
-    [first, second, end].join(" "),
-  ).then((result) => {
-    return result.rows;
-  })
+    from dict_meta as dm left outer join dict_enum as d on d.classification=dm.classification
+    ${prefix ? dynamicSql(prefix) : client``}
+    order by dm.sortno asc ,d.sortno asc ;
+    `;
 }
 
 export function getDict(prefix?: string): Promise<DictDetail> {
@@ -63,61 +58,24 @@ export function getDict(prefix?: string): Promise<DictDetail> {
 }
 
 export async function saveDict(params: DictDetail): Promise<void> {
-  //更新字典节点数据的sql
-  const insertMtaSql = `
-    insert into dict_meta(classification,subject,description,sortno) values($1,$2,$3,$4) on conflict(classification) do update set subject=$2,description=$3,sortno=$4;
-  `;
-  // 更新字典枚举值的sql
-  const insertEnumSql = `
-  insert into dict_enum(classification,lang,e_label,e_value,description,sortno) values($1,$2,$3,$4,$5,$6) on conflict(classification,lang) do update set e_label=$3,e_value=$4,description=$5,sortno=$6;
-`;
-  await client.connect();
-
-  // 创建事务对象
-  /* const t = client.createTransaction("wtf", {
-    isolation_level: "repeatable_read",
-  }); */
-  // 开启事务
-  // await t.begin();
-  try {
-    await client.query(insertMtaSql, [
-      params.category,
-      params.subject,
-      params.metaDescription,
-      params.metaSortNo,
-    ]);
-    // const savepoint = await t.savepoint("update_dict_enum");
-    const tempstr = params.dicts.map((i) => {
-      const value = [
-        params.category,
-        i.lang,
-        i.label,
-        i.value,
-        i.description,
-        i.sortNo,
-      ];
-      return `(${value.join(",")})`;
-    }).join(",");
-    /* await client.queryArray`
-  insert into
-  dict_enum(type,lang,label,value,description,sortno)
-  values
-  ${tempstr}
-`; */
-    for (const element of params.dicts) {
-      await client.query(insertEnumSql, [
-        params.category,
-        element.lang,
-        element.label,
-        element.value,
-        element.description,
-        element.sortNo,
-      ]);
-    }
-    console.log(tempstr);
-  } catch (e) {
-    console.error(e);
-  }
 
 
+
+  client.begin(async sql => {
+
+
+    //更新字典节点数据的sql
+    await sql`insert into dict_meta(classification,subject,description,sortno) values(${params.category
+      },${params.subject},${params.metaDescription},${params.metaSortNo})
+       on conflict(classification) do update set subject=${params.subject},description=${params.metaDescription},sortno=${params.metaSortNo}`;
+
+
+    // 更新字典枚举值的sql
+    const formatedObj = params.dicts.map(({ label: e_label, value: e_value, ...ops }) => ({ ...ops, classification: params.category, e_label, e_value }))
+    // sql`insert into public.dict_enum(classification,lang,e_label,e_value,description,sortno) values($1,$2,$3,$4,$5,$6) on conflict(classification,lang) do update set e_label=$3,e_value=$4,description=$5,sortno=$6`
+    await sql`insert into public.dict_enum ${sql(formatedObj)}`
+
+
+
+  })
 }

@@ -1,9 +1,12 @@
 <script setup lang="ts">
 
 
-import { GetCreditList, type DriveMeta, type MessageItem, type CredentialMeta } from "~/database/resume";
+import { type DriveMeta, type MessageItem, type CredentialMeta } from "~/database/resume";
 import STDTable from "~/components/stdtable.vue";
 import type { TableColumn } from "~/components/stdtable.props";
+definePageMeta({
+  layout: 'admin'
+})
 interface MessageInfo {
   message: MessageItem["message"];
   email: MessageItem["email"];

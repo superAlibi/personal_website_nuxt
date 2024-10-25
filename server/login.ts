@@ -1,4 +1,4 @@
-import { getResumeAuthingSDK } from "~/tools/sdk/authing";
+import { getResumeAuthingSDK } from "~/utils/sdk/authing";
 
 export default defineEventHandler(async (event) => {
   const code = getQuery(event).code as string;

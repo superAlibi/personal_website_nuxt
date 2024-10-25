@@ -5,7 +5,7 @@ import {
   getSharedProjects,
   getSkillLevel,
 } from "~/server/api/resume";
-import Hobby from "../../components/hobby.vue";
+import Hobby from "~/components/hobby.vue";
 import { randomBadgeStyle } from "~/components/timeline.props";
 import type { HobbyItem } from "~/components/hobby.props";
 

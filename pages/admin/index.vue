@@ -2,14 +2,19 @@
 
 import { type CredentialMeta, GetCreditList } from "~/database/resume";
 
-
-const credits = ref<CredentialMeta[]>([])
-GetCreditList().then(data => {
-  credits.value = data
+definePageMeta({
+  layout: 'admin'
 })
+const { data } = useFetch<CredentialMeta[]>('/api/admin/creditlist', {
+  query: {
+    pageNo: 1,
+    pageSize: 999,
+  }
+})
+
 </script>
 <template>
   <div>
-    <div>简历分享总计: {{ credits.length }}次</div>
+    <div>简历分享总计: {{ data?.length }}次</div>
   </div>
 </template>

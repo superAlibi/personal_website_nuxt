@@ -1,5 +1,5 @@
 import { decodeBase64, encodeBase64 } from "@std/encoding";
-import { generateAESCryptoObject } from "~/tools/crypto/server";
+import { generateAESCryptoObject } from "~/utils/crypto/server";
 const decoder = new TextDecoder();
 const encoder = new TextEncoder();
 export default defineEventHandler(async (event) => {

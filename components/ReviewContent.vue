@@ -14,7 +14,6 @@ defineSlots<{
   <article class=" gap-0 md:gap-8 grid md:grid-cols-3 grid-cols-1 md:max-w-5xl mx-auto">
     <div>
       <div class="flex items-center mb-6">
-        <!-- 头像 -->
         <template v-if="typeof userAvatar === 'string'">
           <img class="w-10 h-10 rounded-full" :src="userAvatar || '/profile-picture-5.jpg'" alt="avatar image" />
         </template>
@@ -28,12 +27,12 @@ defineSlots<{
         <ul class="space-y-4 text-sm text-gray-500 dark:text-gray-400">
 
           <li v-for="{ link, ...ops } in metas" v-bind="ops" :class="`flex items-center `">
-            <Icon :name="ops.icon" />
+            <Icon v-if="ops.icon" :name="ops.icon" />
             <template v-if="typeof link === 'string'">
               {{ link }}
             </template>
             <template v-else>
-              <a v-bind="omit(link, 'children')">{{ link.children }}</a>
+              <a v-bind="omit(link, ['children'])">{{ link.children }}</a>
             </template>
           </li>
         </ul>

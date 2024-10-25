@@ -3,7 +3,7 @@ import {
   GetCredit,
   UpdateCredential,
 } from "~/database/resume";
-import { getResumeAuthingSDK } from "~/tools/sdk/authing";
+import { getResumeAuthingSDK } from "~/utils/sdk/authing";
 
 import dayjs from "dayjs";
 import type { UserInfo } from "~/types";

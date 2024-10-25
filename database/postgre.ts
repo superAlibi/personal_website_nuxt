@@ -1,3 +1,9 @@
-import { Pool, Connection } from "postgrejs";
-const pgpool = new Pool();
-export const pgClient = new Connection();
+import postgres from "postgres";
+const sql = postgres({
+  host: 'localhost',
+  database: 'personal_website',
+  username: 'xjm',
+  password: '598230',
+
+});
+export const pgClient = sql;

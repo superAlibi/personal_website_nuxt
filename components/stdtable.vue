@@ -21,7 +21,7 @@ const emit = defineEmits<{
 /**
  * 标准表格组件
  */
-interface STDTableProps extends Omit<TableHTMLAttributes, 'onSelect'> {
+interface STDTableProps extends /* @vue-ignore */ Omit<TableHTMLAttributes, 'onSelect'> {
   class?: string;
   columns: TableColumn<T>[];
   tableList: T[];
@@ -100,7 +100,7 @@ defineSlots<{
   <div class="relative overflow-x-auto shadow-md xs:rounded-lg " :class="$props.class">
     <div v-if="$slots.actions || $slots.search || props.actions"
       class="flex justify-between items-center xs:items-start xs:flex-col flex-wrap xs:space-y-4 space-y-0 py-4 ">
-      <!-- {/* 操作按钮 */} -->
+
       <slot name="actions" v-if="$attrs.actions || Array.isArray($attrs.actions)">
         <div class="relative group">
           <button
@@ -114,7 +114,7 @@ defineSlots<{
                 d="m1 1 4 4 4-4" />
             </svg>
           </button>
-          <!-- {/* 菜单下拉框 */} -->
+
           <div id="dropdownAction"
             class="z-10 top-9 left-0  hidden group-focus-within:block absolute divide-y divide-gray-100 rounded-lg shadow w-max bg-white dark:bg-gray-700  dark:divide-gray-600">
 
@@ -133,7 +133,7 @@ defineSlots<{
           </div>
         </div>
       </slot>
-      <!-- {/* 右边 */} -->
+
       <slot name="search" v-if="$attrs.onSearch">
         <label for="table-search" class="sr-only">Search</label>
         <div class="relative">
