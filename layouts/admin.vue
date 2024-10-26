@@ -20,8 +20,6 @@ const user = useState<UserDto>('apiAdminContextInfo')
       </template>
     </Sidebar>
     <main class="p-4 sm:ml-64 grow px-4 pt-4 md:min-h-screen md:overflow-x-hidden">
-      <header>
-      </header>
       <slot />
     </main>
   </div>

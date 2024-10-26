@@ -12,7 +12,7 @@ export default defineEventHandler(async (event) => {
   const result = await GetCreditList();
   const infos = result.filter((i) => {
     const { drives } = i;
-    if (!drives.length) return false;
+    if (!drives?.length) return false;
     return drives.some((i) => i.messages?.length);
   });
 

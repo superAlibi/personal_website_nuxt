@@ -6,7 +6,7 @@ export interface DictMetaGroup {
   metaSortNo: number;
 }
 export interface DictEnum {
-  lang: string;
+  i18n_lang: string;
   label: string;
   value: string;
   description: string;
@@ -21,7 +21,7 @@ export type DictDetail = DictMetaGroup & {
 export async function getDictRaw(prefix?: string): Promise<DictMeta[]> {
   const dynamicSql = (prefix: string) => client` where dm.classification like '%${prefix.trim()}%'`
   return client<DictMeta[]>
-    `select dm.classification as category,dm.subject,dm.description as metaDescription ,dm.sortno as metaSortNo,d.lang,d.e_label as label,d.e_value as value,d.description ,d.sortno as sortNo
+    `select dm.classification as category,dm.subject,dm.description as metaDescription ,dm.sortno as metaSortNo,d.i18n_lang,d.e_label as label,d.e_value as value,d.description ,d.sortno as sortNo
     from dict_meta as dm left outer join dict_enum as d on d.classification=dm.classification
     ${prefix ? dynamicSql(prefix) : client``}
     order by dm.sortno asc ,d.sortno asc ;
@@ -36,7 +36,7 @@ export function getDict(prefix?: string): Promise<DictDetail> {
         subject,
         metaDescription,
         sortNo: metaSortNo,
-        lang,
+        i18n_lang,
         label,
         value,
         description,
@@ -51,7 +51,7 @@ export function getDict(prefix?: string): Promise<DictDetail> {
           dicts: [],
         });
       }
-      pre.dicts.push({ lang, label, value, description, sortNo: enumSortNo });
+      pre.dicts.push({ i18n_lang, label, value, description, sortNo: enumSortNo });
       return pre;
     }, {} as DictDetail);
   });

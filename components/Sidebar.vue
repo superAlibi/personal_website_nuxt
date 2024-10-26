@@ -2,13 +2,15 @@
 
 import { } from "~/components/Navbar.vue";
 import type { MenuItem } from "./NavBar";
+import { omit } from "radash";
+import type { HTMLAttributes } from 'vue'
 
-interface AsidebarProps {
+
+
+interface SidebarProps {
   menus: MenuItem[];
 }
-interface SidebarProps extends AsidebarProps {
-}
-defineProps<SidebarProps>();
+const props = defineProps<SidebarProps>();
 defineSlots<{
   actions?: () => any;
 }>();
@@ -26,7 +28,9 @@ defineSlots<{
         </path>
       </svg>
     </button>
-    <aside>
+    <aside
+      class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full sm:translate-x-0  group-focus-within:translate-x-0"
+      :class="$props.class" v-bind="omit($attrs, ['class', 'menus'])">
       <div class="h-full px-3 py-4 overflow-y-auto bg-gray-50 dark:bg-gray-800">
         <ul class="space-y-2 font-medium">
           <li v-for="item in menus" :key="item.name">
