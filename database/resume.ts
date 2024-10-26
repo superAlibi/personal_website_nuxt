@@ -98,11 +98,17 @@ export async function GetCredit(
   data.drives = drives
   return data;
 }
+
+export async function getCreditCount(): Promise<{ count: number }[]> {
+  return client<{ count: number }[]>`select  count(id)  from public.credentials`
+}
 /**
  * 给出所有的凭据
  * @returns
  */
-export async function GetCreditList(page: number = 1, size: number = 10, options: Partial<CredentialMeta> = {}): Promise<CredentialMeta[]> {
+export async function GetCreditList(options: Partial<CredentialMeta> & { pageNo: number, pageSize?: number } = { pageNo: 1 }) {
+  const { pageNo, pageSize = 10, ...ops } = options
+
   const dynamicSql = (corporateName: string) => client`where cre.com_name like %${corporateName}%`
   const result = await client<CredentialMeta[]>`
     select 
@@ -113,7 +119,7 @@ export async function GetCreditList(page: number = 1, size: number = 10, options
       left join public.acc_drive as ad on cre.id=ad.cre_id
     ${options.corporateName ? dynamicSql(options.corporateName) : client``}
     group by cre.id
-    limit ${size} offset ${(page - 1) * size}
+    limit ${pageSize} offset ${(pageNo - 1) * pageSize}
     ;`
   return result
 }

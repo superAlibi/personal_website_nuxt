@@ -2,7 +2,11 @@
 </script>
 
 <template>
-  <NuxtLayout>
-    <NuxtPage />
-  </NuxtLayout>
+
+  <Body class="bg-white dark:bg-[#2f2f2f] dark:text-white h-screen">
+
+    <NuxtLayout>
+      <NuxtPage />
+    </NuxtLayout>
+  </Body>
 </template>
