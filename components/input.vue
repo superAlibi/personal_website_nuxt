@@ -2,7 +2,7 @@
 import { omit } from 'radash';
 import type { InputHTMLAttributes } from 'vue'
 
-interface InputProp extends InputHTMLAttributes {
+interface InputProp extends  /* @vue-ignore */  InputHTMLAttributes {
   label?: string;
   errormsg?: string;
 }

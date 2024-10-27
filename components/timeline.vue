@@ -2,7 +2,7 @@
 import type { OlHTMLAttributes } from "vue";
 import { randomBadgeStyle, randomActionColor, type TimeLineItemProp } from "./timeline.props";
 import { omit } from "radash";
-interface TimeLineProp extends OlHTMLAttributes {
+interface TimeLineProp extends  /* @vue-ignore */  OlHTMLAttributes {
   items: Array<TimeLineItemProp>;
 }
 

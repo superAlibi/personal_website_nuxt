@@ -15,16 +15,15 @@ export interface ResumeCTX extends CredentialMeta {
 }
 const witeList = ["/admin/login"];
 
-const dl = useLogger()
-export default defineNuxtRouteMiddleware(async (to, from) => {
+export default defineNuxtRouteMidconsoleeware(async (to, from) => {
   // 在nux的中间件中获得cookie
 
   const jwt = useCookie("jwt", { path: "/admin" })
   const config = useRuntimeConfig()
-  dl.info(`${to.fullPath}`);
+  console.info(`${to.fullPath}`);
 
   if (witeList.includes(to.fullPath)) {
-    dl.info(to.fullPath + ":白名单访问");
+    console.info(to.fullPath + ":白名单访问");
     return
   }
 
@@ -36,7 +35,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       responseType: "code",
       scope: "profile openid",
     });
-    dl.info(
+    console.info(
       "/admin:检测到没有access token,重定向登陆",
       result.url,
     );
@@ -58,7 +57,7 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const contextInfo = useState('apiAdminContextInfo', () => ({}))
   return sdk.getProfile({ withCustomData: true })
     .then((user) => {
-      dl.info("通过access token获得用户信息成功");
+      console.info("通过access token获得用户信息成功");
 
       contextInfo.value = user?.data
 
@@ -66,8 +65,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
     }, async (e) => {
       await sdk.revokeToken(jwt.value!);
       jwt.value = null
-      dl.info(`revokeToken ${jwt.value} 成功`);
-      dl.error(e);
+      console.info(`revokeToken ${jwt.value} 成功`);
+      console.error(e);
       throw createError({
         statusCode: 400,
         statusMessage: "通过access token已失效,请重新登陆",

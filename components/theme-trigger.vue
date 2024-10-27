@@ -2,7 +2,7 @@
 
 import type { ButtonHTMLAttributes } from "vue";
 import { useDark, useLocalStorage, useMediaQuery } from "@vueuse/core";
-interface ThemeTriggerProps extends ButtonHTMLAttributes {
+interface ThemeTriggerProps extends  /* @vue-ignore */ ButtonHTMLAttributes {
 }
 const props = defineProps<ThemeTriggerProps>()
 

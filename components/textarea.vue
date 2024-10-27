@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { omit } from 'radash';
 import type { TextareaHTMLAttributes } from 'vue'
-export interface InputProp extends TextareaHTMLAttributes {
+export interface InputProp extends  /* @vue-ignore */  TextareaHTMLAttributes {
   label?: string;
   errormsg?: string;
 }

@@ -1,9 +1,24 @@
 <script setup lang="ts">
 import { omit } from 'radash'
-import type { ReviewContentProps } from './ReviewContent';
 
+import type { AnchorHTMLAttributes, ImgHTMLAttributes, LiHTMLAttributes } from 'vue';
 
-const props = defineProps<ReviewContentProps>()
+export interface MetaProps extends  /* @vue-ignore */  LiHTMLAttributes {
+  link: string | AnchorHTMLAttributes & { children: string }
+  icon?: string
+}
+
+export interface ReviewContentProps {
+  userAvatar?: string | ImgHTMLAttributes;
+  userName: string;
+  metas: MetaProps[];
+  subject: string;
+  updateTime?: string;
+  averageScore?: string;
+  description: string[] | string;
+}
+
+defineProps<ReviewContentProps>()
 defineSlots<{
   metas: any
 }>
@@ -45,7 +60,7 @@ defineSlots<{
 
           <footer v-if="subject">
             <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-              最近更新:{" "}
+              最近更新:
               <time datetime="2022-01-20 19:00">
                 {{ updateTime }}
               </time>

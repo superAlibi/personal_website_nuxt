@@ -2,7 +2,7 @@
 
 import { omit } from 'radash';
 import type { ButtonHTMLAttributes } from 'vue'
-interface ButtonProp extends ButtonHTMLAttributes {
+interface ButtonProp extends  /* @vue-ignore */ ButtonHTMLAttributes {
 
 }
 const props = defineProps<ButtonProp>()
