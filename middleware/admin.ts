@@ -5,7 +5,6 @@ import { getResumeAuthingSDK } from "~/utils/sdk/authing";
 
 
 import type { UserInfo } from "~/types";
-import { useLogger } from "nuxt/kit";
 
 export const DriverIDKey = "di";
 
@@ -15,7 +14,7 @@ export interface ResumeCTX extends CredentialMeta {
 }
 const witeList = ["/admin/login"];
 
-export default defineNuxtRouteMidconsoleeware(async (to, from) => {
+export default defineNuxtRouteMiddleware(async (to, from) => {
   // 在nux的中间件中获得cookie
 
   const jwt = useCookie("jwt", { path: "/admin" })

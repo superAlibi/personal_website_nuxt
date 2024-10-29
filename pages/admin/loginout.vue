@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import process from 'node:process'
 const config = useRuntimeConfig()
 
 /* return sdk.revokeToken(jwk)
