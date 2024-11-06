@@ -1,13 +1,10 @@
-import { getResumeAuthingSDK } from "~/utils/sdk/authing";
-
 export default defineEventHandler(async (event) => {
   const code = getQuery(event).code as string;
-  const config = useRuntimeConfig()
-  const sdk = getResumeAuthingSDK();
+  const sdk = useAuthingClient();
   if (!code) {
     console.info("没有code,需要重定向到认证中心");
     const result = sdk.buildAuthorizeUrl({
-      redirectUri: config.public.location + "/admin/login",
+      redirectUri: "/admin/login",
       responseType: "code",
     });
     return new Response(

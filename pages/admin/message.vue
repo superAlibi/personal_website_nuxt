@@ -1,21 +1,14 @@
 <script setup lang="ts">
 
 
-import { type DriveMeta, type MessageItem, type CredentialMeta } from "~/database/resume";
+
 import STDTable from "~/components/stdtable.vue";
 import type { TableColumn } from "~/components/stdtable.props";
 definePageMeta({
   layout: 'admin'
 })
-interface MessageInfo {
-  message: MessageItem["message"];
-  email: MessageItem["email"];
-  nickName: MessageItem["nickName"];
-  subject: MessageItem["subject"];
-  corporateName: CredentialMeta["corporateName"];
-  driveId: DriveMeta["driveId"];
-}
-const columns: TableColumn<MessageInfo>[] = [
+
+const columns: TableColumn<any>[] = [
   {
     title: "授权主体",
     header: "授权主体",
@@ -42,7 +35,7 @@ const columns: TableColumn<MessageInfo>[] = [
     dataIndex: "message",
   },
 ]
-const { data } = useFetch<MessageInfo[]>('/api/admin/message')
+const { data } = useFetch('/api/admin/message')
 </script>
 <template>
   <STDTable :tableList="data ?? []" :columns="columns">

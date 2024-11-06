@@ -1,7 +1,4 @@
 import type { ManipulateType } from "dayjs";
-import { pgClient as client } from "./postgre";
-
-
 // 凭据简写
 export interface CredentialMeta {
   interval: [string, string]
@@ -71,8 +68,8 @@ export interface DriveMeta {
  */
 export async function GetCredit(
   credit: string,
-): Promise<CredentialMeta | undefined> {
-
+): Promise<CredentialMeta[]> {
+  const client = usePostgres()
   const result = await client<CredentialMeta[]>
     `select 
     cre.id , cre.create_at,cre.com_name,cre."interval",cre.access_token, cre.duration_unit,cre.duration,cre.au_scope
@@ -84,7 +81,8 @@ export async function GetCredit(
 
   const data = result.at(0)
   if (!data) {
-    return
+    await client.end();
+    return []
   }
   const drives = await client<DriveMeta[]>`
     select
@@ -96,19 +94,23 @@ export async function GetCredit(
     group by ad.id
     `
   data.drives = drives
-  return data;
+  await client.end()
+  return [data];
 }
 
 export async function getCreditCount(): Promise<{ count: number }[]> {
-  return client<{ count: number }[]>`select  count(id)  from public.credentials`
+  const client = usePostgres()
+  const result = client<{ count: number }[]>`select  count(id)  from public.credentials`
+  await client.end()
+  return result
 }
 /**
  * 给出所有的凭据
  * @returns
  */
-export async function GetCreditList(options: Partial<CredentialMeta> & { pageNo: number, pageSize?: number } = { pageNo: 1 }) {
+export async function GetCreditList(options: Partial<CredentialMeta> & { pageNo: number, pageSize?: number } = { pageNo: 1 }): Promise<CredentialMeta[]> {
   const { pageNo, pageSize = 10, ...ops } = options
-
+  const client = usePostgres()
   const dynamicSql = (corporateName: string) => client`where cre.com_name like %${corporateName}%`
   const result = await client<CredentialMeta[]>`
     select 
@@ -121,6 +123,7 @@ export async function GetCreditList(options: Partial<CredentialMeta> & { pageNo:
     group by cre.id
     limit ${pageSize} offset ${(pageNo - 1) * pageSize}
     ;`
+  client.end()
   return result
 }
 
@@ -131,6 +134,7 @@ export type UpdateCredentialParam = Omit<CredentialMeta, "createAt">;
  * @returns
  */
 export async function addCredential(params: CredentialMeta) {
+  const client = usePostgres()
   await client`insert into public.credentials (id,com_name,interval,au_scope) 
   values
    (${params.id},${params.corporateName},$${params.interval},${params.auScope})`
@@ -138,6 +142,7 @@ export async function addCredential(params: CredentialMeta) {
   // 在完成数据库操作后，释放连接是一个良好的实践，
   // 它可以将连接返回到连接池中，供其他操作使用，
   // 从而提高数据库连接的利用效率。
+  await client.end()
 }
 /**
  * 更新分享信息
@@ -148,6 +153,7 @@ export async function addCredential(params: CredentialMeta) {
 export async function UpdateCredential(
   params: UpdateCredentialParam,
 ) {
+  const client = usePostgres()
   await client`update public.credentials set 
   access_token=${params.accessToken!},
   com_name=${params.corporateName},
@@ -155,6 +161,7 @@ export async function UpdateCredential(
   au_scope=${params.auScope},
   update_at=NOW()
    where id=${params.id}`
+  await client.end()
 }
 /**
  * 根据分享id添加设备
@@ -165,15 +172,18 @@ export async function UpdateCredential(
 export async function AddDriversByCredit(
   credit: number
 ) {
+  const client = usePostgres()
   await client`insert into public.acc_drive (cre_id)
    values ($${credit})`;
+  await client.end()
 }
 export async function updateDriveAccTime(
   credit: number,
   drives: DriveMeta,
 ) {
+  const client = usePostgres()
   await client`update public.acc_drive set last_acc=now()   where cre_id=${credit} and id=${drives.driveId}`;
-
+  await client.end()
 }
 
 /**
@@ -182,5 +192,7 @@ export async function updateDriveAccTime(
  */
 export async function DeleteCredit(param: Array<number | string>) {
   if (!param.length) { return }
+  const client = usePostgres()
   await client`delete from public.credentials where id in (${param})`
+  await client.end()
 }

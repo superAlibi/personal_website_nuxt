@@ -1,4 +1,3 @@
-import { pgClient as client } from "./postgre";
 export interface DictMetaGroup {
   category: string;
   subject: string;
@@ -19,13 +18,16 @@ export type DictDetail = DictMetaGroup & {
 };
 
 export async function getDictRaw(prefix?: string): Promise<DictMeta[]> {
+  const client = usePostgres()
   const dynamicSql = (prefix: string) => client` where dm.classification like '%${prefix.trim()}%'`
-  return client<DictMeta[]>
+  const result = await client<DictMeta[]>
     `select dm.classification as category,dm.subject,dm.description as metaDescription ,dm.sortno as metaSortNo,d.i18n_lang,d.e_label as label,d.e_value as value,d.description ,d.sortno as sortNo
     from dict_meta as dm left outer join dict_enum as d on d.classification=dm.classification
     ${prefix ? dynamicSql(prefix) : client``}
     order by dm.sortno asc ,d.sortno asc ;
     `;
+  await client.end()
+  return result
 }
 
 export function getDict(prefix?: string): Promise<DictDetail> {
@@ -59,9 +61,9 @@ export function getDict(prefix?: string): Promise<DictDetail> {
 
 export async function saveDict(params: DictDetail): Promise<void> {
 
+  const client = usePostgres()
 
-
-  client.begin(async sql => {
+  await client.begin(async sql => {
 
 
     //更新字典节点数据的sql
@@ -75,7 +77,8 @@ export async function saveDict(params: DictDetail): Promise<void> {
     // sql`insert into public.dict_enum(classification,lang,e_label,e_value,description,sortno) values($1,$2,$3,$4,$5,$6) on conflict(classification,lang) do update set e_label=$3,e_value=$4,description=$5,sortno=$6`
     await sql`insert into public.dict_enum ${sql(formatedObj)}`
 
-
+    await sql.end()
 
   })
+  await client.end()
 }

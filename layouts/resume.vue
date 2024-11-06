@@ -3,8 +3,7 @@ import type { MenuItem } from "~/components/NavBar";
 import Header from "~/components/Navbar.vue";
 import ThemeTrigger from "~/components/theme-trigger.vue";
 import type { UserInfo } from "~/types";
-const ctx = useRoute();
-const { name, nickname } = ctx.meta.state as UserInfo;
+
 const menus: MenuItem[] =
   [{ name: "简历首页", href: ("/resume"), },
   {

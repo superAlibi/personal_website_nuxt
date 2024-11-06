@@ -1,9 +1,10 @@
 import { randomBytes } from 'node:crypto'
 const BaseName = "server-secret-key";
 type Constants = { const_value: string }
-import { pgClient as client } from './postgre'
+
 // const envSecretKey = "server-secret-key";
 export async function getServerSecretKey() {
+  const client = usePostgres()
   const rows = await client<Constants[]>`select const_value  from constants where const_key=${BaseName}`;
   let value = rows.at(0)?.const_value
   if (!value) {
@@ -18,7 +19,7 @@ export async function getServerSecretKey() {
     await client`INSERT INTO constants (const_key, const_value) VALUES (${BaseName}, ${value})`;
 
   }
-
+  await client.end()
 
   return value
 }

@@ -1,4 +1,3 @@
-import { getCreditCount, GetCreditList } from "~/database/resume"
 
 export default defineEventHandler((event) => {
 

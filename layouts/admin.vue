@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { UserDto } from 'authing-node-sdk/dist/models';
+
 import type { MenuItem } from '~/components/NavBar';
 import Sidebar from '~/components/Sidebar.vue';
 const menus: MenuItem[] = [
@@ -9,7 +9,7 @@ const menus: MenuItem[] = [
   { name: "字典管理", href: "/admin/enum", },
 ];
 
-const user = useState<UserDto>('apiAdminContextInfo')
+const user = {}
 </script>
 <template>
 
