@@ -1,4 +1,4 @@
-import { AuthenticationClient } from "authing-sdk";
+import { AuthenticationClient } from "authing-node-sdk";
 
 export const useAuthingClient = (ac?: string) => {
   return new AuthenticationClient({
