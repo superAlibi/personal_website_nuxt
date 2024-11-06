@@ -6,11 +6,10 @@ definePageMeta({
 import type { TableColumn } from "~/components/stdtable.props";
 import STDTable from "~/components/stdtable.vue";
 
-import { type DictMeta } from "~/database/dict";
 
 
-const { data } = useFetch<DictMeta[]>('/api/admin/dict');
-const columns: TableColumn<DictMeta>[] = [
+const { data } = useFetch('/api/admin/dict');
+const columns: TableColumn<any>[] = [
   {
     header: "字典分类代码",
     dataIndex: "category",

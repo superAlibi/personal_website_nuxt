@@ -1,4 +1,4 @@
-import { CredentialMeta, DriveMeta, GetCreditList, MessageItem } from "~/database/resume";
+
 export interface MessageInfo {
   message: MessageItem["message"];
   email: MessageItem["email"];

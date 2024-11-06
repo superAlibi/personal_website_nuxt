@@ -1,4 +1,3 @@
-import { DeleteCredit } from "~/database/resume";
 
 export default defineEventHandler(async (event) => {
   const ids = getQuery(event).ids as Array<string>;

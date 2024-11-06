@@ -1,11 +1,9 @@
 <script setup lang="ts">
 
-import { type CredentialMeta, GetCreditList } from "~/database/resume";
-
 definePageMeta({
   layout: 'admin'
 })
-const { data } = useFetch<CredentialMeta[] | number>('/api/admin/creditlist')
+const { data } = useFetch('/api/admin/creditlist')
 
 </script>
 <template>

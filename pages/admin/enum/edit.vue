@@ -3,12 +3,11 @@ import Input from "~/components/input.vue";
 import Textarea from "~/components/textarea.vue";
 import Enums from "~/components/enums.vue";
 import Button from "~/components/Button.vue";
-import type { DictEnum } from "~/database/dict";
 
 definePageMeta({
   layout: 'admin'
 })
-const enums = reactive<DictEnum[]>([]);
+const enums = reactive([]);
 const saveinfo = reactive({
   category: '',
   subject: '',

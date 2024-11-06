@@ -3,7 +3,6 @@ import STDTable from "~/components/stdtable.vue";
 import Input from "~/components/input.vue";
 import Textarea from "~/components/textarea.vue";
 import Button from "~/components/Button.vue";
-import type { DictEnum } from "~/database/dict";
 import type { TableActionButtonsProps, TableColumn } from "~/components/stdtable.props";
 
 const enums = defineModel<DictEnum[]>({

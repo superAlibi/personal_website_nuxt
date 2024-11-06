@@ -1,6 +1,5 @@
 import { RSAOAEP } from "@advanced/crypto";
 import { decodeBase64, encodeBase64 } from "@std/encoding/base64";
-import { getServerSecretKey } from "~/database/serverkey";
 export default defineEventHandler(async (event) => {
   const pk = getQuery(event).pk as string;
 
@@ -23,7 +22,7 @@ export default defineEventHandler(async (event) => {
     .then(async (key) => {
       // 给出服务器aeskey并通过publickey加密aeskey
       const serverKey = await getServerSecretKey();
-      return RSAOAEP.encrypt(key, serverKey);
+      return RSAOAEP.encrypt(key, /* serverKey */new Uint8Array());
     }).then((ciphertext) => {
       // 将通过publickey加密过得aeskey返回给客户端
       return {

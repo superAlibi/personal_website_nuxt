@@ -1,19 +1,10 @@
-import {
-  type CredentialMeta,
-  GetCredit,
-  UpdateCredential,
-} from "~/database/resume";
-import { getResumeAuthingSDK } from "~/utils/sdk/authing";
+
 
 import dayjs from "dayjs";
 import type { UserInfo } from "~/types";
 export const DriverIDKey = "di";
-getCookie;
-export interface ResumeCTX extends CredentialMeta {
-  st: string;
-  userInfo: UserInfo;
-}
-export default defineNuxtRouteMidconsoleeware(async (to, from) => {
+
+export default defineNuxtRouteMiddleware(async (to, from) => {
   const { st } = to.query;
   const state = st as string;
   if (!state) {
@@ -22,13 +13,13 @@ export default defineNuxtRouteMidconsoleeware(async (to, from) => {
   }
 
   const result = await GetCredit(state);
-  if (!result || !result.accessToken) {
+  if (!result || !result.at(0)?.accessToken) {
     console.info("没有查询到缓存");
 
     return navigateTo("/");
   }
   console.info("通过state:" + state + "查询到分享凭据");
-  const sdk = getResumeAuthingSDK();
+  /* const sdk = useAuthingClient();
   const { active } = await sdk.introspectToken(result.accessToken);
 
   if (!active) {
@@ -45,7 +36,6 @@ export default defineNuxtRouteMidconsoleeware(async (to, from) => {
     console.info("没有根据ac查询到用户信息:" + result.accessToken);
     return navigateTo("/");
   }
-  console.info("state:" + state + ":获得用户openid:" + userInfo.sub);
   console.info("state:" + state + ":获得用户openid:" + userInfo.sub);
   to.meta = { ...result, st: state, userInfo };
 
@@ -69,5 +59,5 @@ export default defineNuxtRouteMidconsoleeware(async (to, from) => {
   } else {
     console.info("state:" + state + ":访问设备:" + driverIdCookie.value);
     // todo 什么设备什么时候访问过可以在此记录
-  }
+  } */
 });

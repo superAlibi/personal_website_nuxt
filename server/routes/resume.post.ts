@@ -1,7 +1,5 @@
-import { useLogger } from "nuxt/kit";
-import { CredentialMeta, GetCredit, UpdateCredential } from "~/database/resume";
 
-const dl = useLogger();
+
 export default defineEventHandler(async (event) => {
 
 
@@ -13,31 +11,31 @@ export default defineEventHandler(async (event) => {
   // const code = form.get("code");
   // const token_type = form.get("token_type");
   // const scope = form.get("scope");
-  dl.info(
+  console.info(
     "接收到认证服务回调信息:" +
     JSON.stringify(Object.fromEntries(form.entries())),
   );
   const record = await GetCredit(state);
   if (!record) {
-    dl.info("接收到认证服务回调,但未查询到凭据:" + state);
+    console.info("接收到认证服务回调,但未查询到凭据:" + state);
     return sendRedirect(event, "/", 302);
   }
 
-  const { ok } = await UpdateCredential(Object.assign(record, {
+  await UpdateCredential(Object.assign(record, {
     id: state as string,
     duration: Number.parseInt(expires_in ?? "0"),
     accessToken: ac as string,
   } as CredentialMeta));
-  if (!ok) {
-    dl.info("接收到认证服务回调,但更新凭据失败:" + state);
+  /* if (!ok) {
+    console.info("接收到认证服务回调,但更新凭据失败:" + state);
     return sendRedirect(event, "/", 302);
-  }
+  } */
 
   const urlObj = new URL(event.path);
   urlObj.pathname = "/resume";
   urlObj.searchParams.set("st", state as string); // 传入临时state,不直接暴露access_token
   const location = urlObj.toString();
-  dl.info("已更新凭据,重定向至:" + location);
+  console.info("已更新凭据,重定向至:" + location);
   return sendRedirect(event, location, 302);
 
 })

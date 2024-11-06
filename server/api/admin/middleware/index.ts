@@ -1,11 +1,5 @@
 
 
-import { decodeBase64 } from "@std/encoding/base64";
-import { generateAESCryptoObject } from "~/utils/crypto/server";
-import { ConsoleHandler, getLogger, setup } from "@std/log";
-import dayjs from "dayjs";
-
-const dl = getLogger();
 // 接口白名单列表
 const whiteList: Array<string> = [];
 // 加密排除名单列表
@@ -28,7 +22,7 @@ export default defineEventHandler(async (event) => {
   const t = getCookie(event, 't');
 
   if (!t) {
-    dl.warn("没有访问令牌");
+    console.warn("没有访问令牌");
   }
 
   if (encryptExcludeList.includes(event.path)) {

@@ -1,7 +1,6 @@
-import { AuthenticationClient } from "authing-node-sdk";
+import { AuthenticationClient } from "authing-sdk";
 
-export const getResumeAuthingSDK = (ac?: string) => {
-  const config = useRuntimeConfig()
+export const useAuthingClient = (ac?: string) => {
   return new AuthenticationClient({
     appId: process.env.AUTHING_APP_ID!,
     appHost: process.env.ADMIN_AUTHING_DOMAIN!,

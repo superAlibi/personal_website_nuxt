@@ -3,7 +3,6 @@
 
 import Hobby from "~/components/hobby.vue";
 import { randomBadgeStyle } from "~/components/timeline.props";
-import type { HobbyItem } from "~/components/hobby.props";
 
 const { data: hobbys } = useFetch('/api/resume/hobby', {
   transform: (data) => {
@@ -66,7 +65,7 @@ useHead({
               icon: 'ep:orange',
               link: {
                 href: i.companyMapLink,
-                children: i.companyAddress,
+                children: i.companyAddress ?? '',
               },
             },
             { icon: 'ep:timer', link: i.startWidth ?? '', },

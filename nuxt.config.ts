@@ -2,11 +2,19 @@
 export default defineNuxtConfig({
   compatibilityDate: "2024-04-03",
   devtools: { enabled: true },
-
-  runtimeConfig: {
-    apiSecret: process.env.AUTHING_SECRET_KEY,
+  devServer: {
+    // host: true,
   },
-  modules: ["@nuxt/icon", "nuxt-radash", "@nuxtjs/tailwindcss", "@vueuse/nuxt"],
+  runtimeConfig: {
+
+  },
+  modules: [
+    "@nuxt/icon",
+    "nuxt-radash",
+    "@nuxtjs/tailwindcss",
+    "@vueuse/nuxt"
+  ],
+
   tailwindcss: {
     config: {
       darkMode: "class",

@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import { type CredentialMeta } from "~/database/resume";
-import { type DriveMeta } from "~/database/resume";
+
 import type { TableActionButtonsProps, TableColumn } from "~/components/stdtable.props";
 
 
@@ -30,13 +29,13 @@ const disabled = computed(() => {
  * 查看访问设备
  */
 const dialogRef = ref<HTMLDialogElement>();
-const choosedDrive = ref<Partial<CredentialMeta>>({});
+const choosedDrive = ref<any>({});
 
-function showDetail(row: CredentialMeta) {
+function showDetail(row: any) {
   unref(dialogRef)?.show();
   choosedDrive.value = row;
 }
-const columns: TableColumn<DriveMeta>[] = [
+const columns: TableColumn<any>[] = [
   {
     header: "创建时间",
     dataIndex: "createAt",
@@ -51,14 +50,14 @@ const columns: TableColumn<DriveMeta>[] = [
 
   },
 ]
-function handleSelect(e: CredentialMeta[]) {
+function handleSelect(e: any[]) {
   const rows = e
   choosedSet.clear()
   rows.forEach(r => {
     choosedSet.add(r.id)
   })
 }
-const listColums: TableColumn<CredentialMeta>[] = [
+const listColums: TableColumn<any>[] = [
 
   {
     header: "创建时间",
@@ -90,7 +89,7 @@ const listColums: TableColumn<CredentialMeta>[] = [
   },
 ]
 
-const { data, refresh } = useFetch<CredentialMeta[]>("/api/admin/resume", { params: { pageNo: 1, pageSize: 10 }, lazy: true, server: false, })
+const { data, refresh } = useFetch("/api/admin/resume", { params: { pageNo: 1, pageSize: 10 }, lazy: true })
 async function handleDelete() {
 
   await $fetch("/api/admin/resume", { query: { ids: Array.from(choosedSet.values()) }, method: 'delete' })
