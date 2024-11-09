@@ -12,7 +12,8 @@ export default defineNuxtConfig({
     "@nuxt/icon",
     "nuxt-radash",
     "@nuxtjs/tailwindcss",
-    "@vueuse/nuxt"
+    "@vueuse/nuxt",
+    "@nuxt/ui"
   ],
 
   tailwindcss: {
