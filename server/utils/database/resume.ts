@@ -100,7 +100,7 @@ export async function GetCredit(
 
 export async function getCreditCount(): Promise<{ count: number }[]> {
   const client = usePostgres()
-  const result = client<{ count: number }[]>`select  count(id)  from public.credentials`
+  const result = await client<{ count: number }[]>`select  count(id)  from public.credentials`
   await client.end()
   return result
 }
@@ -108,8 +108,8 @@ export async function getCreditCount(): Promise<{ count: number }[]> {
  * 给出所有的凭据
  * @returns
  */
-export async function GetCreditList(options: Partial<CredentialMeta> & { pageNo: number, pageSize?: number } = { pageNo: 1 }): Promise<CredentialMeta[]> {
-  const { pageNo, pageSize = 10, ...ops } = options
+export async function GetCreditList(options?: Partial<CredentialMeta> & { pageNo?: number, pageSize?: number }): Promise<CredentialMeta[]> {
+  const { pageNo = 1, pageSize = 10, corporateName, ...ops } = options ?? {}
   const client = usePostgres()
   const dynamicSql = (corporateName: string) => client`where cre.com_name like %${corporateName}%`
   const result = await client<CredentialMeta[]>`
@@ -119,7 +119,7 @@ export async function GetCreditList(options: Partial<CredentialMeta> & { pageNo:
     from 
       public.credentials as cre 
       left join public.acc_drive as ad on cre.id=ad.cre_id
-    ${options.corporateName ? dynamicSql(options.corporateName) : client``}
+    ${corporateName ? dynamicSql(corporateName) : client``}
     group by cre.id
     limit ${pageSize} offset ${(pageNo - 1) * pageSize}
     ;`

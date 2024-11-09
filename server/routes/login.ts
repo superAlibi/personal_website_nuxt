@@ -35,6 +35,7 @@ export default defineEventHandler(async (event) => {
         path: "/admin",
         maxAge: authingInfo.expires_in,
       });
+      sendRedirect(event, "/admin", 302);
       return resp;
     }, (e) => {
       console.error(
