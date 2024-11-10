@@ -1,6 +1,5 @@
 <script setup lang="ts">
 const appConfig = useAppConfig()
-console.log(appConfig)
 
 useDark()
 </script>
@@ -12,8 +11,8 @@ useDark()
   </Head>
 
   <Body class="bg-white dark:bg-[#2f2f2f] dark:text-white h-screen">
-    <NuxtLayout>
+    <UApp>
       <NuxtPage />
-    </NuxtLayout>
+    </UApp>
   </Body>
 </template>

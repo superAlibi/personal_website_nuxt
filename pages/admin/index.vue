@@ -7,7 +7,7 @@ const { data } = useFetch('/api/admin/creditlist')
 
 </script>
 <template>
-  <div>
+  <NuxtLayout name="admin">
     <div>简历分享总计: {{ data as number }}次</div>
-  </div>
+  </NuxtLayout>
 </template>
