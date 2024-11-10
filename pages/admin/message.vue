@@ -1,44 +1,36 @@
 <script setup lang="ts">
-
-
-
-import STDTable from "~/components/stdtable.vue";
-import type { TableColumn } from "~/components/stdtable.props";
-definePageMeta({
-  layout: 'admin'
-})
-
+import type { TableColumn } from '@nuxt/ui'
 const columns: TableColumn<any>[] = [
   {
-    title: "授权主体",
+
     header: "授权主体",
-    dataIndex: "corporateName",
+    accessorKey: "corporateName",
   },
   {
-    title: "留言昵称",
     header: "留言昵称",
-    dataIndex: "nickName",
+    accessorKey: "nickName",
   },
   {
-    title: "主题",
     header: "主题",
-    dataIndex: "subject",
+    accessorKey: "subject",
   },
   {
-    title: "联系邮箱",
     header: "联系邮箱",
-    dataIndex: "email",
+    accessorKey: "email",
+
   },
   {
-    title: "留言",
     header: "留言",
-    dataIndex: "message",
+    accessorKey: "message",
   },
 ]
 const { data } = useFetch('/api/admin/message')
+console.log(data.value);
+
 </script>
 <template>
-  <STDTable :tableList="data ?? []" :columns="columns">
-  </STDTable>
-
+  <NuxtLayout name="admin">
+    <UTable :data="data ?? []" :columns="columns">
+    </UTable>
+  </NuxtLayout>
 </template>
