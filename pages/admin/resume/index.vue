@@ -30,7 +30,7 @@ const disabled = computed(() => {
  * 查看访问设备
  */
 
-const choosedDrive = ref<CredentialMeta>({});
+const choosedDrive = ref<CredentialMeta>();
 
 function showDetail(row: CredentialMeta) {
   openDetail.value = true
@@ -41,7 +41,7 @@ const columns: TableColumn<DriveMeta>[] = [
     header: "创建时间",
     accessorKey: "createAt",
     cell: ({ row }) => {
-      return new Date(row.createAt).toLocaleString()
+      return new Date(row.original.createAt).toLocaleString()
     }
   },
   {
@@ -53,9 +53,9 @@ const columns: TableColumn<DriveMeta>[] = [
     accessorKey: "messages",
     cell: ({ row }) => {
       return h('a', {
-        to: `/admin/message?di=${row.driveId}`,
+        to: `/admin/message?di=${row.original.driveId}`,
         class: 'font-medium text-blue-600 dark:text-blue-500 hover:underline'
-      }, `查看(${row.messages?.length ?? 0})`)
+      }, `查看(${row.original.messages?.length ?? 0})`)
     }
   },
 ]
@@ -67,14 +67,29 @@ function handleSelect(e: any[]) {
   })
 }
 const listColums: TableColumn<CredentialMeta>[] = [
-
+  {
+    id: 'select',
+    header: ({ table }) =>
+      h('UCheckbox', {
+        modelValue: table.getIsAllPageRowsSelected(),
+        indeterminate: table.getIsSomePageRowsSelected(),
+        'onUpdate:modelValue': (value: boolean) => table.toggleAllPageRowsSelected(!!value),
+        ariaLabel: 'Select all'
+      }),
+    cell: ({ row }) =>
+      h('UCheckbox', {
+        modelValue: row.getIsSelected(),
+        'onUpdate:modelValue': (value: boolean) => row.toggleSelected(!!value),
+        ariaLabel: 'Select row'
+      })
+  },
   {
     header: "创建时间",
-    accessorKey: "createAt",
+    accessorKey: "create_at",
   },
   {
     header: "分享目标",
-    accessorKey: "corporateName",
+    accessorKey: "com_name",
   },
   {
     header: "有效期",
@@ -86,15 +101,15 @@ const listColums: TableColumn<CredentialMeta>[] = [
   },
   {
     header: "有效期单位",
-    accessorKey: "durationUnit",
+    accessorKey: "duration_unit",
   },
   {
     header: "已查看设备",
     cell: ({ row }) => {
       return h('a', {
         class: 'hover:cursor-pointer text-blue-600',
-        onClick: () => showDetail(row)
-      }, `查看(${row.drives?.length ?? 0})`)
+        onClick: () => showDetail(row.original)
+      }, `查看(${row.original.drives?.length ?? 0})`)
     }
   },
 
@@ -117,53 +132,25 @@ async function handleDelete() {
 
   refresh()
 }
-const tableActions = [
-  {
-    label: "激活",
-    class: "w-full px-4 rounded py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white",
 
-  },
-  {
-    label: "禁用",
-    class: "w-full px-4 rounded py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white",
-
-  },
-  {
-    label: '删除分享',
-    disabled: disabled.value,
-    class: 'w-full px-4 rounded py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white',
-    onSelect: handleDelete
-  }
-  ,
-  {
-    label: '新增分享',
-    class: 'w-full inline-block px-4 rounded py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white',
-    onSelect: () => {
-      navigateTo('/admin/resume/edit')
-    }
-  }
-
-
-]
-
-
+const tableRef = useTemplateRef('tableRef')
 </script>
 <template>
   <NuxtLayout name="admin">
-    <UModal v-model:open="openDetail" title="设备信息" description="访问过的设备列表">
+    <USlideover direction="right" v-model:open="openDetail" title="访客设备" description="访问过的设备列表">
       <template #body>
         <UTable :tableList="choosedDrive?.drives ?? []" :columns="columns" />
       </template>
       <template #footer>
         <UButton color="neutral" label="关闭" @click="openDetail = false" />
       </template>
-    </UModal>
-    <ClientOnly>
-
-      <UDropdownMenu :items="tableActions" class="w-48">
-        <UButton icon="i-lucide-menu" color="neutral" variant="outline" />
-      </UDropdownMenu>
-    </ClientOnly>
-    <UTable class="h-full" @select="handleSelect" :data="data ?? []" :columns="listColums" />
+    </USlideover>
+    <UButtonGroup>
+      <UButton icon="i-lucide-plus" label="新增分享" to="/admin/resume/edit" />
+      <UButton icon="i-lucide-trash" label="删除分享" @click="handleDelete" :disabled="disabled" />
+      <UButton icon="i-lucide-lock" label="禁用" :disabled="disabled" />
+      <UButton icon="i-lucide-unlock" label="激活" :disabled="disabled" />
+    </UButtonGroup>
+    <UTable class="h-full" ref="tableRef" @select="handleSelect" :data="data ?? []" :columns="listColums" />
   </NuxtLayout>
 </template>
