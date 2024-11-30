@@ -12,7 +12,9 @@ useDark()
 
   <Body class="bg-white dark:bg-[#2f2f2f] dark:text-white h-screen">
     <UApp>
-      <NuxtPage />
+      <NuxtLayout>
+        <NuxtPage />
+      </NuxtLayout>
     </UApp>
   </Body>
 </template>
